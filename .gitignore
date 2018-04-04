@@ -1,0 +1,11 @@
+node_modules
+.tmp/
+reports/
+coverage.html
+npm-debug.log
+.idea
+build/
+.gradle/
+*.iml
+out/
+bin/
