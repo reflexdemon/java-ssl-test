@@ -47,28 +47,29 @@ public class SSLTest {
         System.out.println("-sslprotocol                 Sets the SSL/TLS protocol to be used (e.g. SSL, TLS, SSLv3, TLSv1.2, etc.)");
         System.out.println("-enabledprotocols protocols  Sets individual SSL/TLS ptotocols that should be enabled");
         System.out.println("-ciphers cipherspec          A comma-separated list of SSL/TLS ciphers");
-
+        System.out.println();
         System.out.println("-keystore                    Sets the key store for connections (for TLS client certificates)");
         System.out.println("-keystoretype type           Sets the type for the key store");
         System.out.println("-keystorepassword pass       Sets the password for the key store");
         System.out.println("-keystoreprovider provider   Sets the crypto provider for the key store");
-
+        System.out.println();
         System.out.println("-truststore                  Sets the trust store for connections");
         System.out.println("-truststoretype type         Sets the type for the trust store");
         System.out.println("-truststorepassword pass     Sets the password for the trust store");
         System.out.println("-truststorealgorithm alg     Sets the algorithm for the trust store");
         System.out.println("-truststoreprovider provider Sets the crypto provider for the trust store");
         System.out.println("-crlfilename                 Sets the CRL filename to use for the trust store");
-
+        System.out.println();
         System.out.println("-check-certificate           Checks certificate trust (default: false)");
         System.out.println("-no-check-certificate        Ignores certificate errors (default: true)");
         System.out.println("-verify-hostname             Verifies certificate hostname (default: false)");
         System.out.println("-no-verify-hostname          Ignores hostname mismatches (default: true)");
-
+        System.out.println();
         System.out.println("-showsslerrors               Show SSL/TLS error details");
         System.out.println("-showhandshakeerrors         Show SSL/TLS handshake error details");
         System.out.println("-showerrors                  Show all connection error details");
         System.out.println("-hiderejects                 Only show protocols/ciphers which were successful");
+        System.out.println("-showcerts                   Shows some basic Certificate details");
         System.out.println();
         System.out.println("-h -help --help              Shows this help message");
     }
