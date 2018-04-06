@@ -65,7 +65,7 @@ function getJdeploySupportDir() {
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
-var jarName = "java-ssl-test-all-1.0.jar";
+var jarName = "java-ssl-test-all-1.0.5.jar";
 var mainClass = "{{MAIN_CLASS}}";
 var classPath = "{{CLASSPATH}}";
 var port = "0";
