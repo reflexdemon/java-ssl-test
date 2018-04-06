@@ -4,6 +4,7 @@ import io.vpv.net.model.CipherConfig;
 import io.vpv.net.model.CipherResponse;
 import io.vpv.net.service.CipherService;
 import io.vpv.net.util.SSLUtils;
+import io.vpv.net.util.TimeUtil;
 
 import javax.crypto.Cipher;
 import javax.net.ssl.*;
@@ -12,7 +13,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.Provider;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -73,6 +77,7 @@ public class SSLTest {
 
     public static void main(String[] args)
             throws Exception {
+        long startTime = System.currentTimeMillis();
         // Enable all algorithms + protocols
         // System.setProperty("jdk.tls.client.protocols", "SSLv2Hello,SSLv3,TLSv1,TLSv1.1,TLSv1.2");
         Security.setProperty("jdk.tls.disabledAlgorithms", "");
@@ -463,9 +468,10 @@ outDone = true;
             System.out.println("!!! host " + host + " supports SSLv2");
         }
 */
+        System.out.println(String.format("Total Execution time: %s", TimeUtil.formatElapsedTime(System.currentTimeMillis() - startTime)));
     }
 
-    private static void probeCipherProbe(CipherConfig params) throws NoSuchAlgorithmException, KeyManagementException {
+    private static void probeCipherProbe(CipherConfig params) {
         List<CipherResponse> responses = cipherService.invoke(params);
 
         //Print them

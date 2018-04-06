@@ -18,7 +18,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * Created by vprasanna on 4/3/18.
@@ -28,7 +31,7 @@ public class CipherService {
      * The executor.
      */
     private static final ExecutorService executor = Executors
-            .newFixedThreadPool(5);
+            .newFixedThreadPool(10);
     public SSLSocket createSSLSocket(InetSocketAddress address,
                                              String host,
                                              int port,
@@ -74,7 +77,7 @@ public class CipherService {
         return sb.toString();
     }
 
-    public List<CipherResponse> invoke(CipherConfig params) throws NoSuchAlgorithmException, KeyManagementException {
+    public List<CipherResponse> invoke(CipherConfig params) {
         String[] sslEnabledProtocols = params.getSslEnabledProtocols();
         List<String> supportedProtocols = params.getSupportedProtocols();
         Set<String> cipherSuites = params.getCipherSuites();
@@ -125,26 +128,38 @@ public class CipherService {
 //                if (stop) {
 //                    break;
 //                }
-                CompletableFuture<CipherResponse> futureResponse = performCipherTest(params, rand, keyManagers, trustManagers, showHandshakeErrors, stop, showSSLErrors, showErrors, hideRejects, reportFormat, errorReportFormat, protocol, cipherSuite);
+                CompletableFuture<CipherResponse> futureResponse = CompletableFuture.supplyAsync(() -> {
+                    return performCipherTest(params, rand, keyManagers,
+                            trustManagers, showHandshakeErrors,
+                            stop, showSSLErrors, showErrors,
+                            hideRejects, reportFormat, errorReportFormat,
+                            protocol, cipherSuite);
+                }, executor);
                 if (null != futureResponse) {
                     futureResponses.add(futureResponse);
                 }
             }
         }
-        CompletableFuture.allOf(futureResponses.toArray( new CompletableFuture[futureResponses.size()])).join();
-        futureResponses.stream()
-                .forEach(response -> {
-                            try {
-                                responses.add(response.get());
-                            } catch (ExecutionException | InterruptedException e) {
-                                System.out.println("Problem while accessing network:" + e.getMessage());
-                            }
-                        }
-                );
+//        CompletableFuture.allOf(futureResponses.toArray( new CompletableFuture[futureResponses.size()])).join();
+//
+//
+//        futureResponses.stream()
+//                .forEach(response -> {
+//                            try {
+//                                responses.add(response.get());
+//                            } catch (ExecutionException | InterruptedException e) {
+//                                System.out.println("Problem while accessing network:" + e.getMessage());
+//                            }
+//                        }
+//                );
+        responses = futureResponses.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+        executor.shutdown();
         return responses;
     }
 
-    private CompletableFuture<CipherResponse> performCipherTest(CipherConfig params, SecureRandom rand, KeyManager[] keyManagers, TrustManager[] trustManagers, boolean showHandshakeErrors, boolean stop, boolean showSSLErrors, boolean showErrors, boolean hideRejects, String reportFormat, String errorReportFormat, String protocol, String cipherSuite) throws NoSuchAlgorithmException, KeyManagementException {
+    private CipherResponse performCipherTest(CipherConfig params, SecureRandom rand, KeyManager[] keyManagers, TrustManager[] trustManagers, boolean showHandshakeErrors, boolean stop, boolean showSSLErrors, boolean showErrors, boolean hideRejects, String reportFormat, String errorReportFormat, String protocol, String cipherSuite) {
                     String status;
 
                     SSLSocketFactory sf = null;
@@ -228,8 +243,7 @@ public class CipherService {
                     }
 
 
-
-        return  CompletableFuture.completedFuture(new CipherResponse(cipherSuite, status, protocol, error, stop));
+        return new CipherResponse(cipherSuite, status, protocol, error, stop);
 
 
     }
