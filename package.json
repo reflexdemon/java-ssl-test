@@ -7,9 +7,9 @@
   "main": "index.js",
   "preferGlobal": true,
   "repository": "",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "jdeploy": {
-    "jar": "build/libs/java-ssl-test-all-1.0.jar"
+    "jar": "build/libs/java-ssl-test-all-1.0.3.jar"
   },
   "dependencies": {
     "shelljs": "^0.7.5"

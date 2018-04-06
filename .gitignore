@@ -9,3 +9,7 @@ build/
 *.iml
 out/
 bin/
+
+.classpath
+.project
+.settings/
