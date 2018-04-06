@@ -1,0 +1,25 @@
+{
+  "bin": {
+    "javassltest": "jdeploy-bundle/jdeploy.js"
+  },
+  "author": "",
+  "description": "",
+  "main": "index.js",
+  "preferGlobal": true,
+  "repository": "",
+  "version": "1.0.1",
+  "jdeploy": {
+    "jar": "build/libs/java-ssl-test-all-1.0.jar"
+  },
+  "dependencies": {
+    "shelljs": "^0.7.5"
+  },
+  "license": "ISC",
+  "name": "java-ssltest-cli",
+  "files": [
+    "jdeploy-bundle"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
