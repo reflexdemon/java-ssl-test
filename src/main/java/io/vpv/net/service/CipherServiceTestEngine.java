@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 /**
  * Created by vprasanna on 4/3/18.
  */
-public class CipherService {
+public class CipherServiceTestEngine {
     /**
      * The executor.
      */

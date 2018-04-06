@@ -2,7 +2,7 @@ package io.vpv.net;
 
 import io.vpv.net.model.CipherConfig;
 import io.vpv.net.model.CipherResponse;
-import io.vpv.net.service.CipherService;
+import io.vpv.net.service.CipherServiceTestEngine;
 import io.vpv.net.util.SSLUtils;
 import io.vpv.net.util.TimeUtil;
 
@@ -19,11 +19,9 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * A driver class to test a server's SSL/TLS support.
@@ -41,7 +39,7 @@ import java.util.List;
  */
 public class SSLTest {
 
-    static final CipherService cipherService = new CipherService();
+    static final CipherServiceTestEngine testEngine = new CipherServiceTestEngine();
 
     private static void usage() {
         System.out.println("Usage: java " + SSLTest.class + " [opts] host[:port]");
@@ -299,8 +297,10 @@ public class SSLTest {
         String errorReportFormat = "%9s %8s %s %s%n";
         System.out.print(String.format(reportFormat, "Supported", "Protocol", "Cipher"));
 
-        if (connectOnly)
+        if (connectOnly) {
             sslEnabledProtocols = new String[0];
+        }
+
         CipherConfig cipherConfig = new CipherConfig();
         cipherConfig.setConnectTimeout(connectTimeout);
         cipherConfig.setReadTimeout(readTimeout);
@@ -319,9 +319,8 @@ public class SSLTest {
         cipherConfig.setRand(rand);
         cipherConfig.setReportFormat(reportFormat);
         cipherConfig.setErrorReportFormat(errorReportFormat);
-//        CipherConfig cipherConfig =  new CipherConfig(connectTimeout, readTimeout, hideRejects, sslEnabledProtocols, sslCipherSuites, showHandshakeErrors, showSSLErrors, showErrors, keyManagers, trustManagers, port, host, address, supportedProtocols, rand, reportFormat, errorReportFormat);
 
-        probeCipherProbe(cipherConfig);
+        cipherProbe(cipherConfig);
 
         if (supportedProtocols.isEmpty()) {
             System.err.println("This client supports none of the requested protocols: "
@@ -336,7 +335,7 @@ public class SSLTest {
         // If the user didn't provide a specific set of cipher suites,
         // use the system's *complete* set of supported cipher suites.
         if (null == sslCipherSuites)
-            sslCipherSuites = cipherService.getJVMSupportedCipherSuites(sslProtocol, rand);
+            sslCipherSuites = testEngine.getJVMSupportedCipherSuites(sslProtocol, rand);
 
         SSLSocketFactory sf = SSLUtils.getSSLSocketFactory(sslProtocol,
                 protocolsToTry,
@@ -345,53 +344,38 @@ public class SSLTest {
                 trustManagers,
                 keyManagers);
 
+        performBasicConnectivityTest(connectTimeout, readTimeout, showCerts, port, host, address, supportedProtocols, sf);
+
+        System.out.println(String.format("Total Execution time: %s", TimeUtil.formatElapsedTime(System.currentTimeMillis() - startTime)));
+    }
+
+    private static void performBasicConnectivityTest(int connectTimeout, int readTimeout, boolean showCerts, int port, String host, InetSocketAddress address, List<String> supportedProtocols, SSLSocketFactory sf) throws IOException {
         SSLSocket socket = null;
 
         try {
-            socket = cipherService.createSSLSocket(address, host, port, connectTimeout, readTimeout, sf);
+            socket = testEngine.createSSLSocket(address, host, port, connectTimeout, readTimeout, sf);
+            socket.startHandshake();
 
-            try {
-                socket.startHandshake();
+            System.out.print("Given this client's capabilities ("
+                    + supportedProtocols
+                    + "), the server prefers protocol=");
+            System.out.print(socket.getSession().getProtocol());
+            System.out.print(", cipher=");
+            System.out.println(socket.getSession().getCipherSuite());
 
-                System.out.print("Given this client's capabilities ("
-                        + supportedProtocols
-                        + "), the server prefers protocol=");
-                System.out.print(socket.getSession().getProtocol());
-                System.out.print(", cipher=");
-                System.out.println(socket.getSession().getCipherSuite());
-
-                if (showCerts) {
-                    System.out.println("Attempting to check certificate:");
-                    for (Certificate cert : socket.getSession().getPeerCertificates()) {
-                        String certType = cert.getType();
-                        System.out.println("Certificate: " + certType);
-                        if ("X.509".equals(certType)) {
-                            X509Certificate x509 = (X509Certificate) cert;
-                            System.out.println("Subject: " + x509.getSubjectDN());
-                            System.out.println("Issuer: " + x509.getIssuerDN());
-                            System.out.println("Serial: " + x509.getSerialNumber());
-                            try {
-                                x509.checkValidity();
-                                System.out.println("Certificate is currently valid.");
-                            } catch (CertificateException ce) {
-                                System.out.println("WARNING: certificate is not valid: " + ce.getMessage());
-                            }
-                            //                   System.out.println("Signature: " + toHexString(x509.getSignature()));
-                            //                   System.out.println("cert bytes: " + toHexString(cert.getEncoded()));
-                            //                   System.out.println("cert bytes: " + cert.getPublicKey());
-                        } else {
-                            System.out.println("Unknown certificate type (" + cert.getType() + "): " + cert);
-                        }
-                    }
-                }
-            } catch (SocketException se) {
-                System.out.println("Error during connection handshake for protocols "
-                        + supportedProtocols
-                        + ": server likely does not support any of these protocols.");
-
-                if (showCerts)
-                    System.out.println("Unable to show server certificate without a successful handshake.");
+            if (showCerts) {
+                showCertificateDetails(socket);
             }
+        } catch (SocketException se) {
+            System.out.println("Error during connection handshake for protocols "
+                    + supportedProtocols
+                    + ": server likely does not support any of these protocols.");
+
+            if (showCerts)
+                System.out.println("Unable to show server certificate without a successful handshake.");
+        } catch (CertificateParsingException e) {
+            System.out.println("Unable to get the certificate details:" + e.getLocalizedMessage());
+            e.printStackTrace();
         } finally {
             if (null != socket) try {
                 socket.close();
@@ -399,80 +383,62 @@ public class SSLTest {
                 ioe.printStackTrace();
             }
         }
-
-/*
-        System.out.println("Attempting to determine the server's SSLv2 capabilities using OpenSSL s_client...");
-        // Try an SSLv2 connection with OpenSSL's s_client, just for kicks.
-        Process p = Runtime.getRuntime().exec(new String[] {
-                "openssl", "s_client",
-                "-ssl2",
-                "-connect", host + ":" + port }
-        );
-        // Make sure this process isn't trying to read from stdin
-        OutputStream out = p.getOutputStream();
-        out.close();
-        InputStream stdout = p.getInputStream();
-        InputStream stderr = p.getErrorStream();
-        // Use NIO so we don't block like an idiot
-        ReadableByteChannel in = Channels.newChannel(stdout);
-        ReadableByteChannel err = Channels.newChannel(stderr);
-        ByteBuffer buf = ByteBuffer.allocate(4096);
-        StringBuilder outsb = new StringBuilder();
-        StringBuilder errsb = new StringBuilder();
-        byte[] buffer = new byte[4096];
-        boolean outDone = false, errDone = false;
-        do
-        {
-            int read;
-*/
-/*
-            if(!outDone) {
-                read = in.read(buf);
-                if(-1 != read) {
-                    buf.flip();
-                    buf.get(buffer, 0, read);
-                    System.out.println("Read " + read + " from stdout");
-                    outsb.append(new String(buffer, 0, read));
-                } else {
-                    outDone = true;
-                    // System.out.println("Output stream is done");
-                }
-                buf.flip();
-            }
-*/
-/*
-outDone = true;
-            if(!errDone) {
-                read = err.read(buf);
-                if(-1 == read) {
-                    buf.flip();
-                    buf.get(buffer, 0, read);
-                    System.out.println("Read " + read + " from stderr");
-                    errsb.append(new String(buffer, 0, read));
-                } else {
-                    errDone = true;
-                    // System.out.println("Error stream is done");
-                }
-                buf.flip();
-            }
-            Thread.sleep(100);
-        } while(!outDone && !errDone);
-        int status = p.waitFor();
-        System.out.println("finally read " + err.read(buf) + " from stderr");
-        if(0 < outsb.length())
-            System.out.print("STDOUT: " + outsb);
-        if(0 < errsb.length())
-            System.out.print("STDERR: " + errsb);
-        System.out.println("Process exit code was: " + status);
-        if(outsb.toString().contains("SSL handshake")) {
-            System.out.println("!!! host " + host + " supports SSLv2");
-        }
-*/
-        System.out.println(String.format("Total Execution time: %s", TimeUtil.formatElapsedTime(System.currentTimeMillis() - startTime)));
     }
 
-    private static void probeCipherProbe(CipherConfig params) {
-        List<CipherResponse> responses = cipherService.invoke(params);
+    private static void showCertificateDetails(SSLSocket socket) throws SSLPeerUnverifiedException, CertificateParsingException {
+        System.out.println("Attempting to check certificate:");
+        for (Certificate cert : socket.getSession().getPeerCertificates()) {
+            String certType = cert.getType();
+            System.out.println("Certificate: " + certType);
+            if ("X.509".equals(certType)) {
+                X509Certificate x509 = (X509Certificate) cert;
+                System.out.println("Subject: " + x509.getSubjectDN());
+                System.out.println("Issuer: " + x509.getIssuerDN());
+                System.out.println("Serial: " + x509.getSerialNumber());
+                try {
+                    x509.checkValidity();
+                    System.out.println("Certificate is currently valid.");
+                } catch (CertificateException ce) {
+                    System.out.println("WARNING: certificate is not valid: " + ce.getMessage());
+                }
+//               System.out.println("Signature: " + testEngine.toHexString(x509.getSignature()));
+//               System.out.println("cert bytes: " + testEngine.toHexString(cert.getEncoded()));
+//               System.out.println("cert bytes: " + cert.getPublicKey());
+                System.out.println("Alternate Names: " + getAlternativeNames(x509.getSubjectAlternativeNames()));
+
+            } else {
+                System.out.println("Unknown certificate type (" + cert.getType() + "): " + cert);
+            }
+        }
+    }
+
+    private static String getAlternativeNames(Collection<List<?>> subjectAlternativeNames) {
+        final StringBuilder builder = new StringBuilder();
+        if (null != subjectAlternativeNames && subjectAlternativeNames.size() != 0) {
+            subjectAlternativeNames.stream()
+                    .map(list -> {
+                        if (null != list && list.size() >= 2) {
+                            return list.get(1);
+                        } else {
+                            return null;
+                        }
+                    }).filter(value -> value != null)
+                    .forEach(name -> {
+                        if (builder.length() > 0) {
+                            builder.append(", ").append(name);
+                        } else {
+                            builder.append(name);
+                        }
+                    });
+        } else {
+            builder.append("Unavailable");
+        }
+
+        return builder.toString();
+    }
+
+    private static void cipherProbe(CipherConfig params) {
+        List<CipherResponse> responses = testEngine.invoke(params);
 
         //Print them
         responses.stream()
