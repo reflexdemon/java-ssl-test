@@ -3,7 +3,6 @@ package io.vpv.net.service;
 import io.vpv.net.model.CipherConfig;
 import io.vpv.net.model.CipherResponse;
 import io.vpv.net.util.SSLUtils;
-import sun.security.validator.ValidatorException;
 
 import javax.net.ssl.*;
 import java.io.IOException;
@@ -14,6 +13,7 @@ import java.net.SocketTimeoutException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -197,11 +197,9 @@ public class CipherServiceTestEngine {
                         status = "Accepted";
                     } catch (SSLHandshakeException she) {
                         Throwable cause = she.getCause();
-                        if (null != cause && cause instanceof ValidatorException) {
+                        if (null != cause && cause instanceof CertificateException) {
                             status = "Untrusted";
                             error = "Server certificate is not trusted. All other connections will fail similarly.";
-//                        TODO: Need to add back
-//                        stop = true;
                         } else
                             status = "Rejected";
 

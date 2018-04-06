@@ -3,6 +3,7 @@ package io.vpv.net;
 import io.vpv.net.model.CipherConfig;
 import io.vpv.net.model.CipherResponse;
 import io.vpv.net.service.CipherServiceTestEngine;
+import io.vpv.net.util.ColorPrintUtil;
 import io.vpv.net.util.SSLUtils;
 import io.vpv.net.util.TimeUtil;
 
@@ -42,36 +43,37 @@ public class SSLTest {
     static final CipherServiceTestEngine testEngine = new CipherServiceTestEngine();
 
     private static void usage() {
-        System.out.println("Usage: java " + SSLTest.class + " [opts] host[:port]");
+        ColorPrintUtil.printKeyValue("Usage:", " javassltest [opts] host[:port]");
         System.out.println();
-        System.out.println("-sslprotocol                 Sets the SSL/TLS protocol to be used (e.g. SSL, TLS, SSLv3, TLSv1.2, etc.)");
-        System.out.println("-enabledprotocols protocols  Sets individual SSL/TLS ptotocols that should be enabled");
-        System.out.println("-ciphers cipherspec          A comma-separated list of SSL/TLS ciphers");
+        ColorPrintUtil.println("Options:");
+        ColorPrintUtil.printKeyValue("-sslprotocol", "                 Sets the SSL/TLS protocol to be used (e.g. SSL, TLS, SSLv3, TLSv1.2, etc.)");
+        ColorPrintUtil.printKeyValue("-enabledprotocols protocols", "  Sets individual SSL/TLS ptotocols that should be enabled");
+        ColorPrintUtil.printKeyValue("-ciphers cipherspec", "          A comma-separated list of SSL/TLS ciphers");
         System.out.println();
-        System.out.println("-keystore                    Sets the key store for connections (for TLS client certificates)");
-        System.out.println("-keystoretype type           Sets the type for the key store");
-        System.out.println("-keystorepassword pass       Sets the password for the key store");
-        System.out.println("-keystoreprovider provider   Sets the crypto provider for the key store");
+        ColorPrintUtil.printKeyValue("-keystore", "                    Sets the key store for connections (for TLS client certificates)");
+        ColorPrintUtil.printKeyValue("-keystoretype type", "           Sets the type for the key store");
+        ColorPrintUtil.printKeyValue("-keystorepassword pass", "       Sets the password for the key store");
+        ColorPrintUtil.printKeyValue("-keystoreprovider provider", "   Sets the crypto provider for the key store");
         System.out.println();
-        System.out.println("-truststore                  Sets the trust store for connections");
-        System.out.println("-truststoretype type         Sets the type for the trust store");
-        System.out.println("-truststorepassword pass     Sets the password for the trust store");
-        System.out.println("-truststorealgorithm alg     Sets the algorithm for the trust store");
-        System.out.println("-truststoreprovider provider Sets the crypto provider for the trust store");
-        System.out.println("-crlfilename                 Sets the CRL filename to use for the trust store");
+        ColorPrintUtil.printKeyValue("-truststore", "                  Sets the trust store for connections");
+        ColorPrintUtil.printKeyValue("-truststoretype type", "         Sets the type for the trust store");
+        ColorPrintUtil.printKeyValue("-truststorepassword pass", "     Sets the password for the trust store");
+        ColorPrintUtil.printKeyValue("-truststorealgorithm alg", "     Sets the algorithm for the trust store");
+        ColorPrintUtil.printKeyValue("-truststoreprovider provider", " Sets the crypto provider for the trust store");
+        ColorPrintUtil.printKeyValue("-crlfilename", "                 Sets the CRL filename to use for the trust store");
         System.out.println();
-        System.out.println("-check-certificate           Checks certificate trust (default: false)");
-        System.out.println("-no-check-certificate        Ignores certificate errors (default: true)");
-        System.out.println("-verify-hostname             Verifies certificate hostname (default: false)");
-        System.out.println("-no-verify-hostname          Ignores hostname mismatches (default: true)");
+        ColorPrintUtil.printKeyValue("-check-certificate", "           Checks certificate trust (default: false)");
+        ColorPrintUtil.printKeyValue("-no-check-certificate", "        Ignores certificate errors (default: true)");
+        ColorPrintUtil.printKeyValue("-verify-hostname", "             Verifies certificate hostname (default: false)");
+        ColorPrintUtil.printKeyValue("-no-verify-hostname", "          Ignores hostname mismatches (default: true)");
         System.out.println();
-        System.out.println("-showsslerrors               Show SSL/TLS error details");
-        System.out.println("-showhandshakeerrors         Show SSL/TLS handshake error details");
-        System.out.println("-showerrors                  Show all connection error details");
-        System.out.println("-hiderejects                 Only show protocols/ciphers which were successful");
-        System.out.println("-showcerts                   Shows some basic Certificate details");
+        ColorPrintUtil.printKeyValue("-showsslerrors", "               Show SSL/TLS error details");
+        ColorPrintUtil.printKeyValue("-showhandshakeerrors", "         Show SSL/TLS handshake error details");
+        ColorPrintUtil.printKeyValue("-showerrors", "                  Show all connection error details");
+        ColorPrintUtil.printKeyValue("-hiderejects", "                 Only show protocols/ciphers which were successful");
+        ColorPrintUtil.printKeyValue("-showcerts", "                   Shows some basic Certificate details");
         System.out.println();
-        System.out.println("-h -help --help              Shows this help message");
+        ColorPrintUtil.printKeyValue("-h -help --help", "              Shows this help message");
     }
 
     public static void main(String[] args)
@@ -177,13 +179,13 @@ public class SSLTest {
                 usage();
                 System.exit(0);
             } else {
-                System.err.println("Unrecognized option: " + arg);
+                ColorPrintUtil.printErrln("Unrecognized option: " + arg);
                 System.exit(1);
             }
         }
 
         if (argIndex >= args.length) {
-            System.err.println("Unexpected additional arguments: "
+            ColorPrintUtil.printErrln("Unexpected additional arguments: "
                     + java.util.Arrays.asList(args).subList(argIndex, args.length));
 
             usage();
@@ -236,27 +238,34 @@ public class SSLTest {
         try {
             InetAddress[] iaddrs = InetAddress.getAllByName(host);
             if (null == iaddrs || 0 == iaddrs.length) {
-                System.err.println("Unknown hostname: " + host);
+                ColorPrintUtil.printErrln("Unknown hostname: " + host);
                 System.exit(1);
             }
-            if (1 == iaddrs.length)
-                System.out.println("Host [" + host + "] resolves to address [" + iaddrs[0].getHostAddress() + "]");
-            else {
-                System.out.print("Host [" + host + "] resolves to addresses ");
+            if (1 == iaddrs.length) {
+                ColorPrintUtil.print("Host [", ColorPrintUtil.COLOR_BLUE);
+                ColorPrintUtil.print(host, ColorPrintUtil.COLOR_BLUE_BOLD);
+                ColorPrintUtil.print("] resolves to address [", ColorPrintUtil.COLOR_BLUE);
+                ColorPrintUtil.print(iaddrs[0].getHostAddress(), ColorPrintUtil.COLOR_BLUE_BOLD);
+                ColorPrintUtil.print("]", ColorPrintUtil.COLOR_BLUE);
+                System.out.println();
+            } else {
+                ColorPrintUtil.print("Host [", ColorPrintUtil.COLOR_BLUE);
+                ColorPrintUtil.print(host, ColorPrintUtil.COLOR_BLUE_BOLD);
+                ColorPrintUtil.print("] resolves to address ", ColorPrintUtil.COLOR_BLUE);
                 for (int i = 0; i < iaddrs.length; ++i) {
                     if (i > 0) System.out.print(", ");
-                    System.out.print("[" + iaddrs[i].getHostAddress() + "]");
+                    ColorPrintUtil.print("[" + iaddrs[i].getHostAddress() + "]", ColorPrintUtil.COLOR_BLUE_BOLD);
                 }
                 System.out.println();
             }
         } catch (UnknownHostException uhe) {
-            System.err.println("Unknown hostname: " + host);
+            ColorPrintUtil.printErrln("Unknown hostname: " + host);
             System.exit(1);
         }
 
         InetSocketAddress address = new InetSocketAddress(host, port);
         if (address.isUnresolved()) {
-            System.err.println("Unknown hostname: " + host);
+            ColorPrintUtil.printErrln("Unknown hostname: " + host);
             System.exit(1);
         }
 
@@ -279,7 +288,7 @@ public class SSLTest {
                 }
             }
             Collections.sort(protocols); // Should give us a nice sort-order by default
-            System.out.println("Auto-detected client-supported protocols: " + protocols);
+            ColorPrintUtil.printKeyValue("Auto-detected client-supported protocols: " , protocols.toString());
             supportedProtocols = protocols;
             sslEnabledProtocols = supportedProtocols.toArray(new String[supportedProtocols.size()]);
         } else {
@@ -288,15 +297,15 @@ public class SSLTest {
 
         // Warn about operating under limited cryptographic controls.
         if (Integer.MAX_VALUE > Cipher.getMaxAllowedKeyLength("foo"))
-            System.err.println("[warning] Client is running under LIMITED cryptographic controls. Consider installing the JCE Unlimited Strength Jurisdiction Policy Files.");
+            ColorPrintUtil.printErrln("[warning] Client is running under LIMITED cryptographic controls. Consider installing the JCE Unlimited Strength Jurisdiction Policy Files.");
 
-        System.out.println("Testing server " + host + ":" + port);
+        ColorPrintUtil.printKeyValue("Testing server ", host + ":" + port);
 
         SecureRandom rand = SecureRandom.getInstance("NativePRNG");
 
         String reportFormat = "%9s %8s %s%n";
         String errorReportFormat = "%9s %8s %s %s%n";
-        System.out.print(String.format(reportFormat, "Supported", "Protocol", "Cipher"));
+        ColorPrintUtil.print(String.format(reportFormat, "Supported", "Protocol", "Cipher"), ColorPrintUtil.COLOR_GREEN_BOLD);
 
         if (connectOnly) {
             sslEnabledProtocols = new String[0];
@@ -324,9 +333,9 @@ public class SSLTest {
         cipherProbe(cipherConfig);
 
         if (supportedProtocols.isEmpty()) {
-            System.err.println("This client supports none of the requested protocols: "
+            ColorPrintUtil.printErrln("This client supports none of the requested protocols: "
                     + Arrays.asList(sslEnabledProtocols));
-            System.err.println("Exiting.");
+            ColorPrintUtil.printErrln("Exiting.");
             System.exit(1);
         }
 
@@ -346,8 +355,7 @@ public class SSLTest {
                 keyManagers);
 
         performBasicConnectivityTest(connectTimeout, readTimeout, showCerts, port, host, address, supportedProtocols, sf);
-
-        System.out.println(String.format("Total Execution time: %s", TimeUtil.formatElapsedTime(System.currentTimeMillis() - startTime)));
+        ColorPrintUtil.printKeyValue("Total Execution time:", TimeUtil.formatElapsedTime(System.currentTimeMillis() - startTime));
     }
 
     private static void performBasicConnectivityTest(int connectTimeout, int readTimeout, boolean showCerts, int port, String host, InetSocketAddress address, List<String> supportedProtocols, SSLSocketFactory sf) throws IOException {
@@ -357,25 +365,25 @@ public class SSLTest {
             socket = testEngine.createSSLSocket(address, host, port, connectTimeout, readTimeout, sf);
             socket.startHandshake();
 
-            System.out.print("Given this client's capabilities ("
+            ColorPrintUtil.print("Given this client's capabilities ("
                     + supportedProtocols
                     + "), the server prefers protocol=");
-            System.out.print(socket.getSession().getProtocol());
-            System.out.print(", cipher=");
-            System.out.println(socket.getSession().getCipherSuite());
-
+            ColorPrintUtil.print(socket.getSession().getProtocol());
+            ColorPrintUtil.print(", cipher=");
+            ColorPrintUtil.print(socket.getSession().getCipherSuite());
+            System.out.println();
             if (showCerts) {
                 showCertificateDetails(socket);
             }
         } catch (SocketException se) {
-            System.out.println("Error during connection handshake for protocols "
+            ColorPrintUtil.printErrln("Error during connection handshake for protocols "
                     + supportedProtocols
                     + ": server likely does not support any of these protocols.");
 
             if (showCerts)
-                System.out.println("Unable to show server certificate without a successful handshake.");
+                ColorPrintUtil.printErrln("Unable to show server certificate without a successful handshake.");
         } catch (CertificateParsingException e) {
-            System.out.println("Unable to get the certificate details:" + e.getLocalizedMessage());
+            ColorPrintUtil.printErrln("Unable to get the certificate details:" + e.getLocalizedMessage());
             e.printStackTrace();
         } finally {
             if (null != socket) try {
@@ -387,28 +395,27 @@ public class SSLTest {
     }
 
     private static void showCertificateDetails(SSLSocket socket) throws SSLPeerUnverifiedException, CertificateParsingException {
-        System.out.println("Attempting to check certificate:");
+        ColorPrintUtil.println("Attempting to check certificate:");
         for (Certificate cert : socket.getSession().getPeerCertificates()) {
             String certType = cert.getType();
             System.out.println("Certificate: " + certType);
             if ("X.509".equals(certType)) {
                 X509Certificate x509 = (X509Certificate) cert;
-                System.out.println("Subject: " + x509.getSubjectDN());
-                System.out.println("Issuer: " + x509.getIssuerDN());
-                System.out.println("Serial: " + x509.getSerialNumber());
+                ColorPrintUtil.printKeyValue("Subject: ",  x509.getSubjectDN().toString());
+                ColorPrintUtil.printKeyValue("Issuer: ",  x509.getIssuerDN().toString());
+                ColorPrintUtil.printKeyValue("Serial: ",  x509.getSerialNumber().toString());
                 try {
                     x509.checkValidity();
-                    System.out.println("Certificate is currently valid.");
+                    ColorPrintUtil.println("Certificate is currently valid.");
                 } catch (CertificateException ce) {
-                    System.out.println("WARNING: certificate is not valid: " + ce.getMessage());
+                    ColorPrintUtil.printErrln("WARNING: certificate is not valid: " + ce.getMessage());
                 }
-//               System.out.println("Signature: " + testEngine.toHexString(x509.getSignature()));
-//               System.out.println("cert bytes: " + testEngine.toHexString(cert.getEncoded()));
-//               System.out.println("cert bytes: " + cert.getPublicKey());
-                System.out.println("Alternate Names: " + getAlternativeNames(x509.getSubjectAlternativeNames()));
-
+//               ColorPrintUtil.printKeyValue("Signature: ", testEngine.toHexString(x509.getSignature()));
+//               ColorPrintUtil.printKeyValue("cert bytes: ",  testEngine.toHexString(cert.getEncoded()));
+//               ColorPrintUtil.printKeyValue("cert bytes: ",  cert.getPublicKey());
+                ColorPrintUtil.printKeyValue("Alternate Names: ", getAlternativeNames(x509.getSubjectAlternativeNames()));
             } else {
-                System.out.println("Unknown certificate type (" + cert.getType() + "): " + cert);
+                ColorPrintUtil.printKeyValue("Unknown certificate type (" + cert.getType() + "): " ,  cert.toString());
             }
         }
     }
@@ -445,16 +452,16 @@ public class SSLTest {
         responses.stream()
                 .forEach(response -> {
                     if (null != response.getError())
-                        System.out.print(String.format(params.getErrorReportFormat(),
+                        ColorPrintUtil.print(String.format(params.getErrorReportFormat(),
                                 response.getStatus(),
                                 response.getProtocol(),
                                 response.getName(),
-                                response.getError()));
+                                response.getError()), ColorPrintUtil.COLOR_BLUE);
                     else if (!params.isHideRejects() || !"Rejected".equals(response.getStatus()))
-                        System.out.print(String.format(params.getReportFormat(),
+                        ColorPrintUtil.print(String.format(params.getReportFormat(),
                                 response.getStatus(),
                                 response.getProtocol(),
-                                response.getName()));
+                                response.getName()), ColorPrintUtil.COLOR_BLUE);
                 });
     }
 

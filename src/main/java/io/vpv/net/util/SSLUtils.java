@@ -81,8 +81,8 @@ public class SSLUtils
     {
         SSLContext sc = SSLContext.getInstance(protocol);
 
-//        System.out.println("Wanted protocol: " + protocol);
-//        System.out.println("Got protocol:    " + sc.getProtocol());
+//        ColorPrintUtil.printKeyValue("Wanted protocol: " , protocol);
+//        ColorPrintUtil.printKeyValue("Got protocol:    " , sc.getProtocol());
 
         sc.init(kms, tms, random);
 
