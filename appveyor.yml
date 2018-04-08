@@ -30,5 +30,6 @@ test_script:
   - java -version
   - javac -version
   - dir *.jar /s/a
+  - cd build\libs
   # run tests
-  - java -jar ".\build\libs\*.jar"
+  - java -jar *.jar
