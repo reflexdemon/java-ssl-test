@@ -24,6 +24,8 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A driver class to test a server's SSL/TLS support.
@@ -43,7 +45,11 @@ public class SSLTest {
 
     private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("EEE, MMM dd yyyy 'at' hh:mm:ss aaa z");
     static final CipherServiceTestEngine testEngine = new CipherServiceTestEngine();
-
+    /**
+     * The executor.
+     */
+    private static final ExecutorService executor = Executors
+            .newFixedThreadPool(10);
     private static void usage() {
         ColorPrintUtil.printKeyValue("Usage:", " javassltest [opts] host[:port]");
         System.out.println();
@@ -358,6 +364,8 @@ public class SSLTest {
 
         performBasicConnectivityTest(connectTimeout, readTimeout, showCerts, port, host, address, supportedProtocols, sf);
         ColorPrintUtil.printKeyValue("Total Execution time:", TimeUtil.formatElapsedTime(System.currentTimeMillis() - startTime));
+
+        executor.shutdown();
     }
 
     private static void performBasicConnectivityTest(int connectTimeout, int readTimeout, boolean showCerts, int port, String host, InetSocketAddress address, List<String> supportedProtocols, SSLSocketFactory sf) throws IOException {
@@ -449,8 +457,8 @@ public class SSLTest {
         return builder.toString();
     }
 
-    private static void cipherProbe(CipherConfig params) {
-        List<CipherResponse> responses = testEngine.invoke(params);
+    private static synchronized void cipherProbe(CipherConfig params) {
+        List<CipherResponse> responses = testEngine.invoke(params, executor);
 
         //Print them
         responses.stream()

@@ -29,7 +29,4 @@ test_script:
   # Output useful info for debugging.
   - java -version
   - javac -version
-  - dir *.jar /s/a
-  - cd build\libs
-  # run tests
-  - java -jar *.jar
+  - gradlew.bat  --debug --info --no-daemon check

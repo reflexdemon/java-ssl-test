@@ -19,19 +19,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 /**
  * Created by vprasanna on 4/3/18.
  */
 public class CipherServiceTestEngine {
-    /**
-     * The executor.
-     */
-    private static final ExecutorService executor = Executors
-            .newFixedThreadPool(10);
+
     public SSLSocket createSSLSocket(InetSocketAddress address,
                                              String host,
                                              int port,
@@ -77,7 +72,7 @@ public class CipherServiceTestEngine {
         return sb.toString();
     }
 
-    public List<CipherResponse> invoke(CipherConfig params) {
+    public List<CipherResponse> invoke(CipherConfig params, Executor executor) {
         String[] sslEnabledProtocols = params.getSslEnabledProtocols();
         List<String> supportedProtocols = params.getSupportedProtocols();
         Set<String> cipherSuites = params.getCipherSuites();
@@ -155,7 +150,6 @@ public class CipherServiceTestEngine {
         responses = futureResponses.stream()
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
-        executor.shutdown();
         return responses;
     }
 
