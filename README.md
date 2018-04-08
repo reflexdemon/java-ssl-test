@@ -6,7 +6,7 @@ This is based upon [ssltest](https://github.com/ChristopherSchultz/ssltest). Unl
 
 [![GitHub version](https://badge.fury.io/gh/reflexdemon%2Fjava-ssl-test.png)](http://badge.fury.io/gh/reflexdemon%2Fjava-ssl-test)
 [![npm version](https://badge.fury.io/js/java-ssltest-cli.png)](http://badge.fury.io/js/java-ssltest-cli)
-
+[![Build status](https://ci.appveyor.com/api/projects/status/kper4nraqsbrhui6/branch/master?svg=true)](https://ci.appveyor.com/project/reflexdemon/java-ssl-test/branch/master)
 
 ## Usage
 
