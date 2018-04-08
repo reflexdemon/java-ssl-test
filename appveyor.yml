@@ -15,7 +15,7 @@ build:
   verbosity: detailed
 
 build_script:
-  - gradlew.bat --info --no-daemon clean fatJar
+  - gradlew.bat  --debug --info --no-daemon clean assemble
 
 branches:
   only:
