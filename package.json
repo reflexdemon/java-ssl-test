@@ -7,14 +7,23 @@
   "main": "index.js",
   "preferGlobal": true,
   "repository": "",
-  "version": "1.0.6",
+  "version": "1.0.8",
+  "keywords": [
+    "java",
+    "ssl",
+    "test",
+    "cli",
+    "tool",
+    "connection"
+  ],
   "jdeploy": {
-    "jar": "build/libs/java-ssl-test-all-1.0.6.jar"
+    "jar": "build/libs/java-ssl-test-1.0.8.jar"
   },
   "dependencies": {
     "shelljs": "^0.7.5"
   },
-  "license": "ISC",
+  "url": "https://github.com/reflexdemon/java-ssl-test",
+  "license": "MIT",
   "name": "java-ssltest-cli",
   "files": [
     "jdeploy-bundle"
