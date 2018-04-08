@@ -29,5 +29,6 @@ test_script:
   # Output useful info for debugging.
   - java -version
   - javac -version
+  - dir *.jar /s/a
   # run tests
   - java -jar .\build\libs\*.jar
