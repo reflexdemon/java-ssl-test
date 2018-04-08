@@ -6,7 +6,7 @@ public class SSLTestTest {
     public void mainWithNoRejects() {
         String[] argv = {
                 "-hiderejects",
-                "me.vpv.io",
+                "www.google.com",
         };
         try {
             SSLTest.main(argv);
