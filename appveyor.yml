@@ -31,4 +31,4 @@ test_script:
   - javac -version
   - dir *.jar /s/a
   # run tests
-  - java -jar .\build\libs\*.jar
+  - java -jar ".\build\libs\*.jar"
