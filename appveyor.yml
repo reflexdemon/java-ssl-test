@@ -1,0 +1,33 @@
+version: "{branch} {build}"
+
+environment:
+  matrix:
+  - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+  - JAVA_HOME: C:\Program Files (x86)\Java\jdk1.8.0
+
+image:
+  - Java SE Development Kit (JDK)
+
+matrix:
+  fast_finish: true
+
+build:
+  verbosity: detailed
+
+build_script:
+  - gradlew.bat clean fatJar
+
+branches:
+  only:
+    - master
+
+cache:
+  - C:\Users\appveyor\.gradl
+
+# Post-install test scripts.
+test_script:
+  # Output useful info for debugging.
+  - java -version
+  - javac -version
+  # run tests
+  - java -jar /build/libs/*.jar

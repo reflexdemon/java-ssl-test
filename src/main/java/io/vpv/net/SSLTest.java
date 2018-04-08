@@ -22,6 +22,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -40,6 +41,7 @@ import java.util.*;
  */
 public class SSLTest {
 
+    private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("EEE, MMM dd yyyy 'at' hh:mm:ss aaa z");
     static final CipherServiceTestEngine testEngine = new CipherServiceTestEngine();
 
     private static void usage() {
@@ -398,12 +400,14 @@ public class SSLTest {
         ColorPrintUtil.println("Attempting to check certificate:");
         for (Certificate cert : socket.getSession().getPeerCertificates()) {
             String certType = cert.getType();
-            System.out.println("Certificate: " + certType);
+            ColorPrintUtil.printKeyValue("Certificate: ",  certType);
             if ("X.509".equals(certType)) {
                 X509Certificate x509 = (X509Certificate) cert;
-                ColorPrintUtil.printKeyValue("Subject: ",  x509.getSubjectDN().toString());
-                ColorPrintUtil.printKeyValue("Issuer: ",  x509.getIssuerDN().toString());
-                ColorPrintUtil.printKeyValue("Serial: ",  x509.getSerialNumber().toString());
+                ColorPrintUtil.printKeyValue("Subject    : ",  x509.getSubjectDN().toString());
+                ColorPrintUtil.printKeyValue("Issuer     : ",  x509.getIssuerDN().toString());
+                ColorPrintUtil.printKeyValue("Serial     : ",  x509.getSerialNumber().toString());
+                ColorPrintUtil.printKeyValue("Not Before : ",  DATA_FORMAT.format(x509.getNotBefore()));
+                ColorPrintUtil.printKeyValue("Not After  : ",  DATA_FORMAT.format(x509.getNotAfter()));
                 try {
                     x509.checkValidity();
                     ColorPrintUtil.println("Certificate is currently valid.");

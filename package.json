@@ -7,9 +7,9 @@
   "main": "index.js",
   "preferGlobal": true,
   "repository": "",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "jdeploy": {
-    "jar": "build/libs/java-ssl-test-all-1.0.5.jar"
+    "jar": "build/libs/java-ssl-test-all-1.0.6.jar"
   },
   "dependencies": {
     "shelljs": "^0.7.5"
@@ -20,6 +20,6 @@
     "jdeploy-bundle"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node jdeploy-bundle/jdeploy.js -hiderejects -showcerts me.vpv.io"
   }
 }
