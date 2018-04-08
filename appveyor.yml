@@ -30,4 +30,4 @@ test_script:
   - java -version
   - javac -version
   # run tests
-  - java -jar ./build/libs/*.jar
+  - java -jar .\build\libs\*.jar
