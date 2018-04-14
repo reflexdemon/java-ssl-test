@@ -42,6 +42,7 @@ Options:
 -showcerts                   Shows some basic Certificate details
 
 -h -help --help              Shows this help message
+-v -version --version        Shows the version information and exists
 
 ```
 

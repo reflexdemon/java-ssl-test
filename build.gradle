@@ -11,7 +11,7 @@ apply plugin: 'java-library'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-version = '1.0.8'
+version = '1.0.9'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 // In this section you declare where to find the dependencies of your project
@@ -30,14 +30,21 @@ dependencies {
 
 //create a single Jar with all dependencies
 jar {
+    doFirst {
+        ant.propertyfile(file: './build/classes/java/main/application.properties') {
+            entry(key: 'application.version', value: version)
+            entry(key: 'application.builtBy', value: System.getProperty('user.name'))
+            entry(key: 'application.builtDate', value: new Date())
+            entry(key: 'application.builtJDK', value: System.getProperty('java.version'))
+        }
+    }
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude "META-INF/*.SF"
         exclude "META-INF/*.DSA"
         exclude "META-INF/*.RSA"
     }
-
     manifest {
-        attributes (
+        attributes(
                 'Implementation-Title': 'SSL Test Tool',
                 'Implementation-Version': version,
                 'Main-Class': 'io.vpv.net.SSLTest',

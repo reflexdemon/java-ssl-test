@@ -6,6 +6,7 @@ import io.vpv.net.service.CipherServiceTestEngine;
 import io.vpv.net.util.ColorPrintUtil;
 import io.vpv.net.util.SSLUtils;
 import io.vpv.net.util.TimeUtil;
+import io.vpv.net.util.VersionUtil;
 
 import javax.crypto.Cipher;
 import javax.net.ssl.*;
@@ -181,6 +182,12 @@ public class SSLTest {
                 connectOnly = true;
             else if ("-hiderejects".equals(arg))
                 hideRejects = true;
+            else if ("--version".equals(arg)
+                    || "-v".equals(arg)
+                    || "-version".equals(arg)) {
+                ColorPrintUtil.printKeyValue("", VersionUtil.getVersion());
+                System.exit(0);
+            }
             else if ("--help".equals(arg)
                     || "-h".equals(arg)
                     || "-help".equals(arg)) {
