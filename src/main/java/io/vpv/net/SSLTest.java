@@ -381,14 +381,14 @@ public class SSLTest {
         try {
             socket = testEngine.createSSLSocket(address, host, port, connectTimeout, readTimeout, sf);
             socket.startHandshake();
-
-            ColorPrintUtil.print("Given this client's capabilities ("
-                    + supportedProtocols
-                    + "), the server prefers protocol=");
-            ColorPrintUtil.print(socket.getSession().getProtocol());
-            ColorPrintUtil.print(", cipher=");
-            ColorPrintUtil.print(socket.getSession().getCipherSuite());
-            System.out.println();
+//
+//            ColorPrintUtil.print("Given this client's capabilities ("
+//                    + supportedProtocols
+//                    + "), the server prefers protocol=");
+//            ColorPrintUtil.print(socket.getSession().getProtocol());
+//            ColorPrintUtil.print(", cipher=");
+//            ColorPrintUtil.print(socket.getSession().getCipherSuite());
+//            System.out.println();
             if (showCerts) {
                 showCertificateDetails(socket);
             }

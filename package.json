@@ -7,7 +7,7 @@
   "main": "index.js",
   "preferGlobal": true,
   "repository": "",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "keywords": [
     "java",
     "ssl",
@@ -17,7 +17,7 @@
     "connection"
   ],
   "jdeploy": {
-    "jar": "build/libs/java-ssl-test-1.0.9.jar"
+    "jar": "build/libs/java-ssl-test-1.0.10.jar"
   },
   "dependencies": {
     "shelljs": "^0.7.5"
