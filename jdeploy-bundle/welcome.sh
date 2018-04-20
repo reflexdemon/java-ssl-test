@@ -8,6 +8,8 @@ elif [ -e ${binLink} ] ; then
    echo "Looks like it is the first run. Have fun!"
 fi
 ln -s $CURRENTDIR/javassltest.sh $binLink
+cd ~/bin
+ln -s $CURRENTDIR/*.jar
 echo "A softlink $binLink has been added!"
 
 if [[ :$PATH: == *:$HOME/bin:* ]]; then
