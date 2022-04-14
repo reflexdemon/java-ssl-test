@@ -288,21 +288,7 @@ public class SSLTest {
 
         if (null == sslEnabledProtocols) {
             // Auto-detect supported protocols
-            ArrayList<String> protocols = new ArrayList<String>();
-            // TODO: Allow the specification of a specific provider (or set?)
-            for (Provider provider : Security.getProviders()) {
-                for (Object prop : provider.keySet()) {
-                    String key = (String) prop;
-                    if (key.startsWith("SSLContext.")
-                            && !"SSLContext.Default".equals(key)
-                            && key.matches(".*[0-9].*"))
-                        protocols.add(key.substring("SSLContext.".length()));
-                    else if (key.startsWith("Alg.Alias.SSLContext.")
-                            && key.matches(".*[0-9].*"))
-                        protocols.add(key.substring("Alg.Alias.SSLContext.".length()));
-                }
-            }
-            Collections.sort(protocols); // Should give us a nice sort-order by default
+            ArrayList<String> protocols = detectSupportedProtocols();
             ColorPrintUtil.printKeyValue("Auto-detected client-supported protocols: " , protocols.toString());
             supportedProtocols = protocols;
             sslEnabledProtocols = supportedProtocols.toArray(new String[supportedProtocols.size()]);
@@ -375,6 +361,25 @@ public class SSLTest {
         executor.shutdown();
     }
 
+    private static ArrayList<String> detectSupportedProtocols() {
+        ArrayList<String> protocols = new ArrayList<String>();
+        // TODO: Allow the specification of a specific provider (or set?)
+        for (Provider provider : Security.getProviders()) {
+            for (Object prop : provider.keySet()) {
+                String key = (String) prop;
+                if (key.startsWith("SSLContext.")
+                        && !"SSLContext.Default".equals(key)
+                        && key.matches(".*[0-9].*"))
+                    protocols.add(key.substring("SSLContext.".length()));
+                else if (key.startsWith("Alg.Alias.SSLContext.")
+                        && key.matches(".*[0-9].*"))
+                    protocols.add(key.substring("Alg.Alias.SSLContext.".length()));
+            }
+        }
+        Collections.sort(protocols); // Should give us a nice sort-order by default
+        return protocols;
+    }
+
     private static void performBasicConnectivityTest(int connectTimeout, int readTimeout, boolean showCerts, int port, String host, InetSocketAddress address, List<String> supportedProtocols, SSLSocketFactory sf) throws IOException {
         SSLSocket socket = null;
 
@@ -423,6 +428,7 @@ public class SSLTest {
                 ColorPrintUtil.printKeyValue("Serial     : ",  x509.getSerialNumber().toString());
                 ColorPrintUtil.printKeyValue("Not Before : ",  DATA_FORMAT.format(x509.getNotBefore()));
                 ColorPrintUtil.printKeyValue("Not After  : ",  DATA_FORMAT.format(x509.getNotAfter()));
+
                 try {
                     x509.checkValidity();
                     ColorPrintUtil.println("Certificate is currently valid.");
